@@ -56,6 +56,22 @@ Vulkan physical device. Software renderers are fallback-only and must be reporte
 honestly. GPU support varies by device/kernel and cannot be guaranteed by package
 installation alone.
 
+## RootFS build pipeline (new, not yet wired into APK initialization)
+
+- `scripts/build-arch-arm64-rootfs.sh` downloads the official generic Arch Linux
+  ARM AArch64 rootfs and verifies its detached OpenPGP signature against the
+  published Arch Linux ARM signing-key fingerprint before extraction.
+- It runs on a native AArch64 Linux host, then invokes
+  `scripts/arch-kde-wayland-bootstrap.sh` inside the extracted rootfs to install
+  the Arch ARM package set for Plasma, KWin, Wayland, Qt Wayland, XWayland
+  compatibility, Mesa/Vulkan userspace and common KDE applications.
+- The resulting `archlinuxarm-aarch64.tar` is a generated build input. It is
+  intentionally not committed as a multi-hundred-megabyte binary asset.
+- The current Android app does not yet consume this generated archive. The
+  `LinuxContainerManager` still points at the Ubuntu tarball and runs Ubuntu
+  offline installers. Do not run the APK build as a release build until the
+  manager, asset staging, and display bridge have been migrated.
+
 ## Arch package bootstrap
 
 `scripts/arch-kde-wayland-bootstrap.sh` installs the userspace packages into an
