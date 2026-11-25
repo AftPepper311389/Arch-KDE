@@ -1,0 +1,23 @@
+name: Port sanity checks
+
+on:
+  push:
+    branches: [main, "work/**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  shell-and-architecture-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell syntax
+        run: |
+          bash -n scripts/arch-kde-wayland-bootstrap.sh
+          bash -n scripts/validate-arch-kde-wayland.sh
+      - name: Verify architecture contract
+        run: |
+          ! grep -RniE 'ubuntu|gnome|xfce4-session|startxfce4' scripts
+          grep -q 'kwin' scripts/arch-kde-wayland-bootstrap.sh
+          grep -q 'startplasma-wayland' scripts/arch-kde-wayland-bootstrap.sh
+          grep -q 'WAYLAND_DISPLAY_BACKEND_READY' scripts/arch-kde-wayland-bootstrap.sh
