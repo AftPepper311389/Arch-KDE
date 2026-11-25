@@ -8,7 +8,7 @@ WORK="${RUNNER_TEMP:-/tmp}/archlinuxarm-rootfs"
 ARCHIVE="${RUNNER_TEMP:-/tmp}/ArchLinuxARM-aarch64-latest.tar.gz"
 SIG="$ARCHIVE.sig"
 KEY_ID="68B3537F39A313B3E574D06777193F152BDBE6A6"
-URL="https://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+URL="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 
 test "$(uname -m)" = "aarch64" || { echo "This rootfs builder must run on native aarch64." >&2; exit 2; }
 command -v bsdtar >/dev/null
@@ -30,7 +30,7 @@ bsdtar -xpf "$ARCHIVE" -C "$WORK"
 
 # Keep the upstream ARMv8 userspace, but remove device-specific boot payloads.
 rm -rf "$WORK/boot" "$WORK/dev" "$WORK/proc" "$WORK/sys" "$WORK/run"
-mkdir -p "$WORK"/{dev,proc,sys,run,tmp}
+mkdir -p "$WORK"/{dev/pts,proc,sys,run,tmp}
 chmod 1777 "$WORK/tmp"
 
 # Set the ARM package mirror and configure a non-device-specific container.
