@@ -16,8 +16,7 @@ concurrency:
 
 jobs:
   assemble-arm64:
-    # The project pins the Linux ARM64 AAPT2 artifact for native ARM64 builds.
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - name: Checkout
