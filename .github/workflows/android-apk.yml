@@ -42,7 +42,7 @@ jobs:
       - name: Verify imported upstream project and large assets
         run: |
           test -f app/src/main/AndroidManifest.xml
-          test -f app/src/main/assets/runtime/arm64-v8a/*
+          find app/src/main/assets/runtime/arm64-v8a -type f -print -quit | grep -q .
           if grep -R -l '^version https://git-lfs.github.com/spec/v1' app/src/main/assets; then
             echo "::error::Git LFS pointer files remain; runtime assets were not materialized."
             exit 1
