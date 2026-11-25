@@ -19,11 +19,11 @@ fi
 
 export LANG=C
 install -d -m 0755 /etc/pacman.d
-if [[ ! -s /etc/pacman.d/mirrorlist ]]; then
-  cat > /etc/pacman.d/mirrorlist <<'MIRRORS'
-Server = https://mirror.archlinuxarm.org/$arch/$repo
+# The generic mirror hostname intermittently fails DNS from hosted CI
+# runners. Use a concrete Arch Linux ARM mirror; users can replace it later.
+cat > /etc/pacman.d/mirrorlist <<'MIRRORS'
+Server = https://ca.us.mirror.archlinuxarm.org/$arch/$repo
 MIRRORS
-fi
 
 # Initialize the Arch Linux ARM keyring before the full system upgrade.
 pacman-key --init
