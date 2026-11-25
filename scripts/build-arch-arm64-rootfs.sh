@@ -56,27 +56,18 @@ cleanup() {
 }
 trap cleanup EXIT
 
+install -m 0755 "$PWD/scripts/arch-kde-wayland-bootstrap.sh" "$WORK/tmp/arch-kde-wayland-bootstrap.sh"
+chroot "$WORK" /bin/bash /tmp/arch-kde-wayland-bootstrap.sh
 chroot "$WORK" /bin/bash -euc '
-  pacman-key --init
-  pacman-key --populate archlinuxarm
-  pacman -Syy --noconfirm
-  pacman -Syu --noconfirm --needed \
-    base sudo bash coreutils util-linux procps-ng iproute2 iputils \
-    dbus polkit seatd \
-    plasma-desktop plasma-workspace kwin wayland wayland-protocols \
-    qt6-wayland xorg-xwayland \
-    mesa libglvnd vulkan-icd-loader \
-    konsole dolphin ark plasma-nm plasma-pa \
-    noto-fonts noto-fonts-cjk ttf-dejavu \
-    git python python-pip base-devel fastfetch
+  getent group wheel >/dev/null || groupadd wheel
+  printf "root:archlinuxarm\\n" | chpasswd
   pacman -Scc --noconfirm
   rm -rf /var/cache/pacman/pkg/*
   rm -rf /var/log/*
   rm -f /etc/machine-id
   touch /etc/machine-id
   ln -sf /usr/share/zoneinfo/UTC /etc/localtime
-  getent group wheel >/dev/null || groupadd wheel
-  printf "root:archlinuxarm\n" | chpasswd
+  rm -f /tmp/arch-kde-wayland-bootstrap.sh
 '
 
 # Preserve permissions and links. Rootfs is a generated build input, not a
