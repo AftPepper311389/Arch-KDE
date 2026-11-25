@@ -61,3 +61,31 @@ installation alone.
 `scripts/arch-kde-wayland-bootstrap.sh` installs the userspace packages into an
 already-created Arch Linux ARM64 RootFS. It does not download or embed the RootFS
 and is not a substitute for the Android display bridge.
+
+## Confirmed blockers in the imported Android source
+
+The following are source-level blockers, not merely missing package selections:
+
+- `app/src/main/java/com/doro/terminal/shell/linux/LinuxContainerManager.kt`
+  still extracts an Ubuntu 24.04 rootfs, verifies Ubuntu-specific asset hashes,
+  invokes `dpkg`/APT, configures Ubuntu locale and paths, installs Debian
+  `.deb` payloads, and validates XFCE commands. This manager must be replaced
+  with an Arch-aware `pacman` initialization path before first boot can work.
+- `app/src/main/AndroidManifest.xml` still declares
+  `com.doro.terminal.shell.x11.X11ServerService`.
+- `app/src/main/java/com/doro/terminal/shell/x11/` contains the current Lorie
+  X11 service/runtime/surface implementation. These classes cannot serve as a
+  Wayland output bridge by changing environment variables.
+- `app/src/main/assets/rootfs/` is currently absent. The repository therefore
+  does not yet contain an embedded Arch ARM64 base rootfs.
+- Existing offline payloads and desktop assets include Ubuntu/Debian packages,
+  XFCE theme assets and Ubuntu-specific Mesa bundle paths. They must not be
+  installed into Arch; replace them with Arch-compatible packages/configuration.
+
+## CI status
+
+The ARM64 Android APK workflow is being repaired independently of the desktop
+port. A successful Gradle APK build would prove only that the Android shell
+compiles; it would not prove that the Arch rootfs, Wayland output, KWin or GPU
+acceleration work. The release gate remains a real first-boot and rendering
+test on an ARM64 Android device.
