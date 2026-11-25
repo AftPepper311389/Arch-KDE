@@ -1,0 +1,46 @@
+name: Import upstream Linuxhub 1.2.0 source
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-upstream.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-linuxhub-1.2.0
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout port repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch exact upstream tag
+        run: |
+          git clone --depth 1 --branch 1.2.0 https://github.com/xishanp/Linuxhub.git /tmp/linuxhub-1.2.0
+          test "$(git -C /tmp/linuxhub-1.2.0 rev-parse HEAD)" = "dc90ca29ec502ff91b31d2fa4c172f885b2d3d7c"
+      - name: Import complete Android project and runtime assets
+        run: |
+          rsync -a --delete             --exclude='/.git/'             --exclude='/.github/'             --exclude='/README.md'             --exclude='/README_EN.md'             --exclude='/PORTING.md'             --exclude='/scripts/'             /tmp/linuxhub-1.2.0/ ./
+          test -f app/build.gradle.kts
+          test -f app/src/main/AndroidManifest.xml
+          test -d app/src/main/java
+          test -d app/src/main/assets/runtime/arm64-v8a
+      - name: Commit imported upstream source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Upstream 1.2.0 source is already imported."
+            exit 0
+          fi
+          git commit -m "Import complete Linuxhub 1.2.0 Android source baseline"
+          git push origin HEAD:main
