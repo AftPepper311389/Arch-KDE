@@ -16,6 +16,8 @@ concurrency:
 
 jobs:
   assemble-arm64:
+    # APK release builds are manual-only until the Arch rootfs and Android Wayland bridge are integrated.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
