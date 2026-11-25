@@ -1,0 +1,51 @@
+name: Build Arch ARM64 KDE RootFS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/build-arch-arm64-rootfs.sh"
+      - "scripts/arch-kde-wayland-bootstrap.sh"
+      - ".github/workflows/arch-rootfs.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arch-arm64-rootfs
+  cancel-in-progress: false
+
+jobs:
+  rootfs:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install host tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y arch-install-scripts bsdtar curl gnupg
+
+      - name: Build and verify Arch Linux ARM64 KDE rootfs
+        run: |
+          sudo --preserve-env=RUNNER_TEMP bash scripts/build-arch-arm64-rootfs.sh "$GITHUB_WORKSPACE/app/src/main/assets/rootfs"
+          sudo bsdtar -tf app/src/main/assets/rootfs/archlinuxarm-aarch64.tar >/dev/null
+          sudo sha256sum -c app/src/main/assets/rootfs/archlinuxarm-aarch64.tar.sha256
+          sudo mkdir -p "$RUNNER_TEMP/rootfs-check"
+          sudo bsdtar -xf app/src/main/assets/rootfs/archlinuxarm-aarch64.tar -C "$RUNNER_TEMP/rootfs-check"
+          test -x "$RUNNER_TEMP/rootfs-check/usr/bin/pacman"
+          test -x "$RUNNER_TEMP/rootfs-check/usr/bin/kwin_wayland"
+          test -x "$RUNNER_TEMP/rootfs-check/usr/bin/startplasma-wayland" || test -x "$RUNNER_TEMP/rootfs-check/usr/bin/plasmashell"
+
+      - name: Upload generated rootfs
+        uses: actions/upload-artifact@v4
+        with:
+          name: archlinuxarm-aarch64-kde-rootfs
+          path: app/src/main/assets/rootfs/archlinuxarm-aarch64.tar
+          if-no-files-found: error
+          retention-days: 7
