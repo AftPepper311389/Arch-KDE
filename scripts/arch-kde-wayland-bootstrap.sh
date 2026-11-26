@@ -41,7 +41,7 @@ pacman -S --needed --noconfirm \
   dolphin konsole kate ark \
   breeze breeze-gtk \
   xdg-user-dirs xdg-utils xdg-desktop-portal xdg-desktop-portal-kde \
-  polkit kscreen libinput \
+  polkit sudo kscreen libinput \
   mesa mesa-utils vulkan-icd-loader vulkan-tools \
   pipewire pipewire-pulse wireplumber \
   ttf-dejavu noto-fonts noto-fonts-cjk
