@@ -39,6 +39,8 @@ jobs:
           sudo mkdir -p "$RUNNER_TEMP/rootfs-check"
           sudo bsdtar -xf app/src/main/assets/rootfs/archlinuxarm-aarch64.tar -C "$RUNNER_TEMP/rootfs-check"
           test -x "$RUNNER_TEMP/rootfs-check/usr/bin/pacman"
+          test -x "$RUNNER_TEMP/rootfs-check/usr/bin/su"
+          test -x "$RUNNER_TEMP/rootfs-check/usr/bin/sudo"
           test -x "$RUNNER_TEMP/rootfs-check/usr/bin/kwin_wayland"
           test -x "$RUNNER_TEMP/rootfs-check/usr/bin/startplasma-wayland" || test -x "$RUNNER_TEMP/rootfs-check/usr/bin/plasmashell"
 
