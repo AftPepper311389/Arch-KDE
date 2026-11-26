@@ -60,7 +60,9 @@ install -m 0755 "$PWD/scripts/arch-kde-wayland-bootstrap.sh" "$WORK/tmp/arch-kde
 chroot "$WORK" /bin/bash /tmp/arch-kde-wayland-bootstrap.sh
 chroot "$WORK" /bin/bash -euc '
   getent group wheel >/dev/null || groupadd wheel
-  printf "root:archlinuxarm\\n" | chpasswd
+  # The Android container manager creates the interactive user during first boot.
+  # Never ship a known default root password in the generated RootFS.
+  passwd -l root
   pacman -Scc --noconfirm
   rm -rf /var/cache/pacman/pkg/*
   rm -rf /var/log/*
