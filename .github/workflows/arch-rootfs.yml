@@ -41,6 +41,7 @@ jobs:
           test -x "$RUNNER_TEMP/rootfs-check/usr/bin/pacman"
           test -x "$RUNNER_TEMP/rootfs-check/usr/bin/su"
           test -x "$RUNNER_TEMP/rootfs-check/usr/bin/sudo"
+          sudo awk -F: '$1 == "root" { if ($2 ~ /^!/) ok=1 } END { exit !ok }' "$RUNNER_TEMP/rootfs-check/etc/shadow"
           test -x "$RUNNER_TEMP/rootfs-check/usr/bin/kwin_wayland"
           test -x "$RUNNER_TEMP/rootfs-check/usr/bin/startplasma-wayland" || test -x "$RUNNER_TEMP/rootfs-check/usr/bin/plasmashell"
 
